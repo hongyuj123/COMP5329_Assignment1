@@ -34,8 +34,10 @@ class PosEncoder(nn.Module):
             [0.0 if i % 2 == 0 else math.pi / 2 for i in range(d_model)],
             dtype=torch.float32
         ).unsqueeze(1)
-        pos = torch.arange(length, dtype=torch.float32).repeat(d_model, 1)
-        pe = torch.sin(pos * freqs + phases)  # [C, L]
+        pos = torch.arange(length, dtype=torch.float32).unsqueeze(0)      # [1, L]
+        freqs = freqs.unsqueeze(1)                                        # [C, 1]
+        phases = phases.unsqueeze(1)                                      # [C, 1]
+        pe = torch.sin(pos * freqs + phases)                              # [C, L]
         self.register_buffer("pos_encoding", pe)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
